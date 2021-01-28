@@ -1,0 +1,17 @@
+racetime:
+  api:
+    base-url: http://localhost:8000
+    websocket-base: ws://localhost:8000
+
+spring:
+  http:
+    converters:
+      preferred-json-mapper: gson
+
+logging:
+  level:
+    root: INFO
+    de:
+      scaramangado: INFO
+  file: race-announcer.log
+  file.max-history: 15
