@@ -6,4 +6,5 @@ RUN mkdir /etc/announcer
 VOLUME ["/etc/announcer"]
 WORKDIR /etc/announcer
 
-CMD ["java", "-jar", "/usr/bin/announcer.jar"]
+CMD ["ls", "-lah"]
+#CMD ["java", "-jar", "/usr/bin/announcer.jar"]
