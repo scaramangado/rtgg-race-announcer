@@ -5,5 +5,5 @@ services:
       context: .
     image: scaramangado/race-announcer
     volumes:
-      - /race-announcer/volume:/etc/race-announcer
+      - /race-announcer/volume:/etc/announcer
     restart: unless-stopped
