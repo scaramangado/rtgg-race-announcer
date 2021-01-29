@@ -21,12 +21,6 @@
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
-# Gradle
-.idea/**/gradle.xml
-.idea/**/libraries
-build/
-.gradle/
-
 # Gradle and Maven with auto-import
 # When using Gradle or Maven with auto-import, you should exclude module files,
 # since they will be recreated, and may cause churn.  Uncomment if using
@@ -141,6 +135,13 @@ hs_err_pid*
 
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
+
+# Gradle
+.idea/**/gradle.xml
+.idea/**/libraries
+build/
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
 
 ### Project Specific ###
 
