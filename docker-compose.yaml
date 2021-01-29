@@ -1,0 +1,9 @@
+version: '3.7'
+services:
+  race-announcer:
+    build:
+      context: .
+    image: scaramangado/race-announcer
+    volumes:
+      - /race-announcer/volume:/etc/race-announcer
+    restart: unless-stopped

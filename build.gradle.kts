@@ -16,7 +16,7 @@ java {
 }
 
 tasks.withType<Jar> {
-  archiveBaseName.set("bingobot")
+  archiveBaseName.set("announcer")
   archiveVersion.set("")
 }
 
