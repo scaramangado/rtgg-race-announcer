@@ -28,17 +28,22 @@ class RaceManager(private val properties: RacetimeProperties, private val discor
 
   private fun updateMessage(race: Race) {
 
-    val announcement = races[race.slug] ?: return logMissingRace(race.slug)
+    try {
+      val announcement = races[race.slug] ?: return logMissingRace(race.slug)
 
-    logger.trace("Update announcement ${race.slug}")
+      logger.trace("Update announcement ${race.slug}")
 
-    if (announcement.messageId.isEmpty()) {
-      announcement.messageId = discordManager.sendMessage(race.toEmbed())
-    } else {
-      discordManager.editMessage(announcement.messageId, race.toEmbed())
+      if (announcement.messageId.isEmpty()) {
+        announcement.messageId = discordManager.sendMessage(race.toEmbed())
+      } else {
+        discordManager.editMessage(announcement.messageId, race.toEmbed())
+      }
+
+      announcement.latestVersion = race.version
+    } catch (e: Exception) {
+      logger.error("Failed to update message. ${e.javaClass.simpleName}: ${e.message}")
+      logger.trace("", e)
     }
-
-    announcement.latestVersion = race.version
   }
 
   private fun logMissingRace(slug: String) {
