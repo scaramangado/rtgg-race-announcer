@@ -11,8 +11,8 @@ group = "de.scaramangado"
 version = "0.0.1-SNAPSHOT"
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_14
-  targetCompatibility = JavaVersion.VERSION_14
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
 }
 
 tasks.withType<Jar> {
