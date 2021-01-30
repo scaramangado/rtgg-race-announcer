@@ -8,11 +8,20 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
-class RaceManager(private val properties: RacetimeProperties, private val discordManager: DiscordManager) {
+class RaceManager(private val properties: RacetimeProperties, private val discordManager: DiscordManager,
+                  private val raceRepository: RaceRepository) {
 
   private val logger = LoggerFactory.getLogger(RaceManager::class.java)
-
   private val races = mutableMapOf<String, AnnouncedRace>()
+
+  init {
+    raceRepository.load()
+        .also {
+          logger.info("Loaded ${it.size} active races")
+        }.forEach {
+          newRaceConnection(it)
+        }
+  }
 
   fun liveRaces(liveRaces: Collection<Race>) {
     liveRaces
@@ -22,8 +31,7 @@ class RaceManager(private val properties: RacetimeProperties, private val discor
 
   private fun announceRace(race: Race) {
     logger.info("Announce new race ${race.slug}")
-    races[race.slug] = AnnouncedRace(race.slug)
-    RaceConnection("${properties.websocketBase}/ws/race/${race.slug}", { updateMessage(it) }, { removeRace(it) })
+    newRaceConnection(AnnouncedRace(race.slug))
   }
 
   private fun updateMessage(race: Race) {
@@ -40,6 +48,7 @@ class RaceManager(private val properties: RacetimeProperties, private val discor
       }
 
       announcement.latestVersion = race.version
+      updateRepository()
     } catch (e: Exception) {
       logger.error("Failed to update message. ${e.javaClass.simpleName}: ${e.message}")
       logger.trace("", e)
@@ -49,6 +58,16 @@ class RaceManager(private val properties: RacetimeProperties, private val discor
   private fun removeRace(race: Race) {
     logger.info("Removing ${race.slug} from active races")
     races.remove(race.slug)
+    updateRepository()
+  }
+
+  private fun newRaceConnection(race: AnnouncedRace) {
+    races[race.raceSlug] = race
+    RaceConnection("${properties.websocketBase}/ws/race/${race.raceSlug}", { updateMessage(it) }, { removeRace(it) })
+  }
+
+  private fun updateRepository() {
+    raceRepository.save(races.values)
   }
 
   private fun logMissingRace(slug: String) {
