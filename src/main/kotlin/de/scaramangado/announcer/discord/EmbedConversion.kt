@@ -7,6 +7,7 @@ import de.scaramangado.announcer.api.model.RaceStatus
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
 import java.awt.Color
+import java.time.Duration
 import java.time.Instant
 
 fun Race.toEmbed(): MessageEmbed =
@@ -49,13 +50,17 @@ private fun Entrant.asEmbedLine() = buildString {
         EntrantStatus.Status.READY -> "*Ready*"
         EntrantStatus.Status.NOT_READY -> "*Not ready*"
         EntrantStatus.Status.IN_PROGRESS -> "*Playing*"
-        EntrantStatus.Status.DONE -> finishTime.toString()
+        EntrantStatus.Status.DONE -> finishTime?.standardFormat() ?: ""
         EntrantStatus.Status.DNF -> "*Forfeit*"
         EntrantStatus.Status.DQ -> "*DQ*"
         null -> "*unknown*"
       }
   )
   append("\n")
+}
+
+fun Duration.standardFormat(): String {
+  return String.format("%d:%02d:%02d", this.toHours(), this.toMinutesPart(), this.toSecondsPart())
 }
 
 private fun RaceStatus.toColor(): Color {

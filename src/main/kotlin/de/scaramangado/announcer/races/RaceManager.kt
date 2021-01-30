@@ -23,7 +23,7 @@ class RaceManager(private val properties: RacetimeProperties, private val discor
   private fun announceRace(race: Race) {
     logger.info("Announce new race ${race.slug}")
     races[race.slug] = AnnouncedRace(race.slug)
-    RaceConnection("${properties.websocketBase}/ws/race/${race.slug}") { updateMessage(it) }
+    RaceConnection("${properties.websocketBase}/ws/race/${race.slug}", { updateMessage(it) }, { removeRace(it) })
   }
 
   private fun updateMessage(race: Race) {
@@ -35,7 +35,7 @@ class RaceManager(private val properties: RacetimeProperties, private val discor
 
       if (announcement.messageId.isEmpty()) {
         announcement.messageId = discordManager.sendMessage(race.toEmbed())
-      } else {
+      } else if (race.version > announcement.latestVersion) {
         discordManager.editMessage(announcement.messageId, race.toEmbed())
       }
 
@@ -44,6 +44,11 @@ class RaceManager(private val properties: RacetimeProperties, private val discor
       logger.error("Failed to update message. ${e.javaClass.simpleName}: ${e.message}")
       logger.trace("", e)
     }
+  }
+
+  private fun removeRace(race: Race) {
+    logger.info("Removing ${race.slug} from active races")
+    races.remove(race.slug)
   }
 
   private fun logMissingRace(slug: String) {

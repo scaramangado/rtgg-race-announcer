@@ -17,7 +17,8 @@ import java.time.Duration
 import java.time.Instant
 import kotlin.concurrent.thread
 
-class RaceConnection(private val raceEndpoint: String, private val messageUpdater: (Race) -> Unit) : WebSocketHandler {
+class RaceConnection(private val raceEndpoint: String, private val messageUpdater: (Race) -> Unit,
+                     private val raceFinishedCallback: (Race) -> Unit) : WebSocketHandler {
 
   private val logger = LoggerFactory.getLogger(RaceConnection::class.java)
 
@@ -73,6 +74,7 @@ class RaceConnection(private val raceEndpoint: String, private val messageUpdate
     messageUpdater(race)
 
     if (race.status.value in setOf(CANCELLED, FINISHED)) {
+      raceFinishedCallback(race)
       thread {
         Thread.sleep(20000)
         logger.info("Closing connection to $raceSlug")
