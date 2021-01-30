@@ -12,7 +12,7 @@ class RaceMonitor(private val httpClient: RacetimeHttpClient, private val raceMa
   fun scanForRaces() {
     raceManager.liveRaces(
         httpClient.getRacesOfCategory("oot")
-            .filter { it.status.value in setOf(OPEN, INVITATIONAL) }
+            .filter { it.status.value in setOf(OPEN, INVITATIONAL, PENDING, IN_PROGRESS) }
     )
   }
 }

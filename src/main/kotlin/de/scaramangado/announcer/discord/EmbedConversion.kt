@@ -40,7 +40,7 @@ private val Race.description
   }
 
 private fun Entrant.asEmbedLine() = buildString {
-  place?.run { append("$this. ") }
+  place?.run { append("**$this.** ") }
   append("**${user?.name}** ")
   append(
       when (status?.value) {
