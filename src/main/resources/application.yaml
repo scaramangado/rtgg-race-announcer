@@ -2,7 +2,6 @@ racetime:
   api:
     base-url: https://racetime.gg
     websocket-base: wss://racetime.gg
-  resolve-teams: true
 
 spring:
   http:
