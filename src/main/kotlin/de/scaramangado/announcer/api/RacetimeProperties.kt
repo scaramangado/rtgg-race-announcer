@@ -8,5 +8,6 @@ import org.springframework.stereotype.Component
 class RacetimeProperties(
 
     var baseUrl: String? = null,
-    var websocketBase: String? = null
+    var websocketBase: String? = null,
+    var resolveTeams: Boolean = true
 )

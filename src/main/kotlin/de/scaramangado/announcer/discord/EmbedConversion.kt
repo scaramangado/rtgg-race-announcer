@@ -84,4 +84,10 @@ private val Race.footer
     RaceStatus.Status.FINISHED -> "Race Over"
     RaceStatus.Status.CANCELLED -> "Cancelled"
     null -> ""
+  }.let {
+    if (teamRace) {
+      "Team Race ($it)"
+    } else {
+      it
+    }
   }

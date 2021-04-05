@@ -1,8 +1,5 @@
 package de.scaramangado.announcer.api.model
 
-import java.time.Duration
-import java.time.Instant
-
 data class Race(
     var version: Int = 0,
     var name: String,
@@ -10,7 +7,8 @@ data class Race(
     var url: String = "https://racetime.gg",
     var goal: RaceGoal,
     var info: String = "",
-    var entrants: List<Entrant>
+    var entrants: List<Entrant>,
+    var teamRace: Boolean = false,
 ) {
   val slug: String get() = name.split("/")[1]
 }
