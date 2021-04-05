@@ -1,9 +1,7 @@
 package de.scaramangado.announcer.discord
 
-import de.scaramangado.announcer.api.model.Entrant
-import de.scaramangado.announcer.api.model.EntrantStatus
-import de.scaramangado.announcer.api.model.Race
-import de.scaramangado.announcer.api.model.RaceStatus
+import de.scaramangado.announcer.api.model.*
+import de.scaramangado.announcer.api.model.EntrantStatus.Status.*
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
 import java.awt.Color
@@ -22,13 +20,13 @@ fun Race.toEmbed(): MessageEmbed =
 private val Race.description
   get() = buildString {
 
-    if (!info.isEmpty()) {
+    if (info.isNotEmpty()) {
       append("**Goal**\n$info\n\n")
     }
 
     if (entrants.isNotEmpty()) {
       append("**Entrants**\n")
-      entrants
+      effectiveEntrantList
           .asSequence()
           .sortedBy { it.place ?: 9999 }
           .take(20)
@@ -44,19 +42,80 @@ private fun Entrant.asEmbedLine() = buildString {
   append("**${user?.name}** ")
   append(
       when (status?.value) {
-        EntrantStatus.Status.REQUESTED -> "*Requested to join*"
-        EntrantStatus.Status.INVITED -> "*Invited*"
-        EntrantStatus.Status.DECLINED -> "*Declined invitation*"
-        EntrantStatus.Status.READY -> "*Ready*"
-        EntrantStatus.Status.NOT_READY -> "*Not ready*"
-        EntrantStatus.Status.IN_PROGRESS -> "*Playing*"
-        EntrantStatus.Status.DONE -> finishTime?.standardFormat() ?: ""
-        EntrantStatus.Status.DNF -> "*Forfeit*"
-        EntrantStatus.Status.DQ -> "*DQ*"
+        REQUESTED -> "*Requested to join*"
+        INVITED -> "*Invited*"
+        DECLINED -> "*Declined invitation*"
+        READY -> "*Ready*"
+        NOT_READY -> "*Not ready*"
+        IN_PROGRESS -> "*Playing*"
+        DONE -> finishTime?.standardFormat() ?: ""
+        DNF -> "*Forfeit*"
+        DQ -> "*DQ*"
         null -> "*unknown*"
       }
   )
   append("\n")
+}
+
+private val Race.effectiveEntrantList: List<Entrant>
+  get() {
+    return if (teamRace) extractTeams() else entrants
+  }
+
+private fun Race.extractTeams(): List<Entrant> {
+
+  fun Map.Entry<Team, List<Entrant>>.convertToEntrant(): Entrant {
+
+    val name =
+        if (key.formal) key.name else value.joinToString { it.user?.name ?: "" }
+
+    val status = when {
+      value.any { it.status?.value == INVITED } -> INVITED
+      value.any { it.status?.value == REQUESTED } -> REQUESTED
+      value.any { it.status?.value == NOT_READY } -> NOT_READY
+      value.all { it.status?.value == READY } -> READY
+      value.any { it.status?.value == IN_PROGRESS } -> IN_PROGRESS
+      value.all { it.status?.value == DNF } -> DNF
+      value.all { it.status?.value in listOf(DONE, DNF) } -> DONE
+      value.any { it.status?.value == DQ } -> DQ
+      else -> NOT_READY
+    }
+
+    println("${key.name}: ${value.map { it.status?.value?.name }.joinToString { it ?: "null" }} => ${status.name}")
+
+    val time = if (status != DONE) null else value.mapNotNull { it.finishTime }.maxOrNull()
+
+    return Entrant(User(name = name), status = EntrantStatus(value = status), finishTime = time)
+  }
+
+  fun List<Entrant>.addPlaces(): List<Entrant> {
+
+    val sorted = this.sortedWith(nullsLast(compareBy { it.finishTime }))
+
+    var currentPlace = 1
+
+    sorted
+        .filter { it.finishTime != null }
+        .forEach { it.place = currentPlace++ }
+
+    return sorted
+  }
+
+  val teams = mutableMapOf<Team, List<Entrant>>()
+
+  entrants
+      .filter { it.team != null }
+      .forEach {
+        val team = requireNotNull(it.team)
+        teams[team] =
+            if (teams[team] == null) {
+              listOf(it)
+            } else {
+              teams[team]!! + it
+            }
+      }
+
+  return teams.map { it.convertToEntrant() }.addPlaces()
 }
 
 fun Duration.standardFormat(): String {
@@ -76,7 +135,7 @@ private fun RaceStatus.toColor(): Color {
 }
 
 private val Race.footer
-  get() = when(status.value) {
+  get() = when (status.value) {
     RaceStatus.Status.OPEN -> "Open"
     RaceStatus.Status.INVITATIONAL -> "Invitational"
     RaceStatus.Status.PENDING -> "Starting..."
