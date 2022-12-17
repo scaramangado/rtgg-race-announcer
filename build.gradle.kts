@@ -1,18 +1,19 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("org.springframework.boot") version "2.2.6.RELEASE"
-  id("io.spring.dependency-management") version "1.0.9.RELEASE"
-  kotlin("jvm") version "1.4.32"
-  kotlin("plugin.spring") version "1.4.32"
+  java
+  id("org.springframework.boot") version "2.7.6"
+  id("io.spring.dependency-management") version "1.1.0"
+  kotlin("jvm") version "1.7.21"
+  kotlin("plugin.spring") version "1.7.21"
 }
 
 group = "de.scaramangado"
 version = "0.0.1-SNAPSHOT"
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_11
-  targetCompatibility = JavaVersion.VERSION_11
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.withType<Jar> {
@@ -29,7 +30,7 @@ dependencies {
 
   implementation("org.springframework.boot:spring-boot-starter")
 
-  implementation("org.glassfish.tyrus.bundles:tyrus-standalone-client:1.15")
+  implementation("org.glassfish.tyrus.bundles:tyrus-standalone-client:1.20")
   implementation("org.springframework:spring-websocket")
   implementation("org.springframework:spring-messaging")
 
@@ -50,10 +51,10 @@ tasks.withType<Test> {
 tasks.withType<KotlinCompile> {
   kotlinOptions {
     freeCompilerArgs = listOf("-Xjsr305=strict")
-    jvmTarget = "1.8"
+    jvmTarget = "17"
   }
 }
 
 tasks.withType<Wrapper> {
-  gradleVersion = "6.8.3"
+  gradleVersion = "7.6"
 }

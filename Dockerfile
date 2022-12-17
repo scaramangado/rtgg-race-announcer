@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk15:alpine
+FROM eclipse-temurin:17-alpine
 
 COPY build/libs/announcer.jar /usr/bin
 
