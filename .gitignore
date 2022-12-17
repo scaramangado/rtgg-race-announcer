@@ -147,3 +147,4 @@ build/
 
 src/main/resources/application-dev.yaml
 active_races.json
+/logs
