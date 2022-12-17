@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  race-announcer:
+    image: ghcr.io/scaramangado/rtgg-race-announcer/race-announcer:latest
+    volumes:
+      - /home/docker/volumes/race-announcer:/etc/announcer
+    restart: unless-stopped
+    networks:
+      - announcer
+
+networks:
+  announcer:

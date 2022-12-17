@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-./gradlew clean
+(cd deployment && sudo docker-compose down)
+
 git pull
-./gradlew build
-docker-compose build --pull
-docker-compose up -d
+(cd deployment \
+  && sudo docker-compose pull \
+  && sudo docker-compose up -d)

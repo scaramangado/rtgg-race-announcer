@@ -1,0 +1,23 @@
+name: Build Docker Image
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Java Setup
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Build
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          arguments: build -x check
+          gradle-version: wrapper
+      - name: Docker
+        run: ./push-container.sh ${{ github.actor }} ${{ secrets.GITHUB_TOKEN }}
