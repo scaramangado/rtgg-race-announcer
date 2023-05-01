@@ -4,7 +4,7 @@ services:
     image: ghcr.io/scaramangado/rtgg-race-announcer/race-announcer:latest
     container_name: race-announcer
     volumes:
-      - /home/docker/volumes/race-announcer:/etc/announcer
+      - ~/docker-volumes/race-announcer:/etc/announcer
     restart: unless-stopped
     networks:
       - announcer
